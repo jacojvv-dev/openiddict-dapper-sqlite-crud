@@ -1,4 +1,5 @@
 using CRUD.Api.Api.Extensions;
+using CRUD.Api.Api.Middleware;
 using CRUD.Api.Application.Extensions;
 using CRUD.Api.Infrastructure.Extensions;
 
@@ -39,6 +40,8 @@ app.UseSwaggerUI(c =>
     c.OAuthClientSecret(configuration["SwaggerConfiguration:OAuthClientSecret"]);
     c.OAuthUsePkce();
 });
+
+app.UseMiddleware<ValidationExceptionHandlerMiddleware>();
 
 app.UseAuthorization();
 app.MapEndpoints();
