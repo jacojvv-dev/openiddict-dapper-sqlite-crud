@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <UserSecretsId>dotnet-CRUD.Api.MigrationRunner-EA4DA38C-D034-4E34-9427-449FEDC93431</UserSecretsId>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="dbup-sqlite" Version="5.0.8" />
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="..\..\.dockerignore">
+        <Link>.dockerignore</Link>
+      </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="scripts\202307032205_CreateShoppingListItemsTable.sql" />
+      <EmbeddedResource Include="scripts\202307032205_CreateShoppingListItemsTable.sql" />
+    </ItemGroup>
+</Project>

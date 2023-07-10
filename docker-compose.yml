@@ -1,0 +1,47 @@
+version: '3'
+
+volumes:
+  identitydatabase:
+  apidatabase:
+
+services:
+  identity:
+    build:
+      context: src/CRUD.Identity/src/
+      dockerfile: Dockerfile
+    volumes:
+      - identitydatabase:/app/Data
+    environment:
+      ConnectionStrings__DefaultConnection: "DataSource=/app/Data/identity.db;Cache=Shared"
+    ports:
+      - 5000:80
+
+  api-migration-runner:
+    build:
+      context: src/CRUD.Api/src/
+      dockerfile: Dockerfile.MigrationRunner
+    volumes:
+      - apidatabase:/app/Data
+    environment:
+      ConnectionStrings__DefaultConnection: "DataSource=/app/Data/api.db;Cache=Shared"
+
+  api:
+    build:
+      context: src/CRUD.Api/src/
+      dockerfile: Dockerfile
+    volumes:
+      - apidatabase:/app/Data
+    depends_on:
+      - identity
+      - api-migration-runner
+    environment:
+      IdentityConfiguration__Issuer: http://identity      
+      IdentityConfiguration__ValidIssuers: "http://identity,http://localhost:5000/"
+      SwaggerConfiguration__OAuthClientId: swagger
+      SwaggerConfiguration__OAuthClientSecret:
+      SwaggerConfiguration__OAuthAuthorizationEndpoint: http://localhost:5000/connect/authorize
+      SwaggerConfiguration__OAuthTokenEndpoint: http://localhost:5000/connect/token
+      ConnectionStrings__DefaultConnection: "DataSource=/app/Data/api.db;Cache=Shared"
+    ports:
+      - 5001:80
+

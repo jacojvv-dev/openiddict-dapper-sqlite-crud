@@ -1,0 +1,18 @@
+﻿FROM mcr.microsoft.com/dotnet/runtime:7.0 AS base
+WORKDIR /app
+
+FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
+WORKDIR /src
+COPY ["CRUD.Api.MigrationRunner/CRUD.Api.MigrationRunner.csproj", "CRUD.Api.MigrationRunner/"]
+RUN dotnet restore "CRUD.Api.MigrationRunner/CRUD.Api.MigrationRunner.csproj"
+COPY . .
+WORKDIR "/src/CRUD.Api.MigrationRunner"
+RUN dotnet build "CRUD.Api.MigrationRunner.csproj" -c Release -o /app/build
+
+FROM build AS publish
+RUN dotnet publish "CRUD.Api.MigrationRunner.csproj" -c Release -o /app/publish /p:UseAppHost=false
+
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+ENTRYPOINT ["dotnet", "CRUD.Api.MigrationRunner.dll"]
